@@ -1,0 +1,4 @@
+category-encoders==2.5.0
+lightgbm==3.3.2
+pandas==1.4.3
+

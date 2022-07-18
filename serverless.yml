@@ -1,0 +1,88 @@
+org: jay007
+app: test-1
+service: test-without-lib
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  region : us-east-1
+  deploymentBucket:
+   name : mlbucket1535
+  iamRoleStatements:
+  - Effect : Allow
+    Action:
+     - s3:GetObject
+    Resource:
+     - arn:aws:s3:::mlbucket1535/*
+  - Effect: Allow
+    Action:
+      - "lambda:InvokeFunction"
+    Resource: "*"
+
+# The package section where we exclude folders from production
+package:
+  individually: true
+  excludeDevDependencies: true
+  patterns:
+    - "!**/**"
+    - "model/**"
+
+
+# The functions section where we create the Lambda function and define the events that invoke it:
+functions:
+  lambda_handler:
+    handler: model/handler.lambda_handler
+    memorySize: 10240
+    timeout: 300
+    events:
+      - http:
+          path: handler.lambda_handler
+          method: post
+          cors: true
+    # warmup: true
+
+
+
+# and finally the plugins section:
+plugins:
+  - serverless-python-requirements
+  
+
+# The custom section where we configure the plugins:
+custom:
+  pythonRequirements:
+  dockerizePip: true
+  zip: true
+  slim: true
+  strip: false
+  noDeploy:
+    - boto3
+    - botocore
+    - s3transfer
+    - docutils
+    - jmespath
+    - pip
+    - python-dateutil
+    - setuptools
+    - six
+    - scikit-learn
+    - threadpoolctl
+    - scipy
+    - virtualenv
+    - joblib
+  useStaticCache: true
+  useDownloadCache: true
+  cacheLocation: "./cache"
+  # warmup:
+  # events:
+  #   - schedule: "rate(5 minutes)"
+  # timeout: 50
+
+  
+
+
+
+
+
+ 
